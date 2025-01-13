@@ -1,32 +1,46 @@
 <!DOCTYPE html>
-<html>
-<body>
-   console log: <div id="tableContainer"></div>
-    <script>
-        function loadFile() {
-            let fileReader = new FileReader();
-            let fileInput = new Blob([/mnt/data/table.csv], { type: 'text/plain' });
+<html lang="it">
 
+<body>
+    <label for="fileInput">Seleziona un file :</label>
+    <input type="file" id="fileInput"  onchange="loadFile(event)">
+    
+    <div id="tableContainer"></div>
+
+    <script>
+        function loadFile(event) {
+            let fileInput = event.target.files[0];
+            if (!fileInput) return;
+
+            let fileReader = new FileReader();
+            
             fileReader.onload = function() {
                 let text = fileReader.result;
                 let table = document.createElement('table');
                 let rows = text.split('\n');
+                
                 for (let i = 0; i < rows.length; i++) {
-                    let line = rows[i];
+                    let row = rows[i].split(',');
                     let tr = document.createElement('tr');
-                    let td = document.createElement('td');
-                    td.textContent = line;
-                    tr.appendChild(td);
+                    
+                    for (let j = 0; j < row.length; j++) {
+                        let td = document.createElement('td');
+                        td.textContent = row[j];
+                        tr.appendChild(td);
+                    }
+
                     table.appendChild(tr);
                 }
+
+                document.getElementById('tableContainer').innerHTML = '';
                 document.getElementById('tableContainer').appendChild(table);
-            }
+            };
 
             fileReader.readAsText(fileInput);
         }
-
-        window.onload = loadFile;
     </script>
 </body>
+</html>
+
 </html>
 
