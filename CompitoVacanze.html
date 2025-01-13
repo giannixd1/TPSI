@@ -1,8 +1,22 @@
 <!DOCTYPE html>
 <html lang="it">
-
+<head>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+    </style>
+</head>
 <body>
-    <label for="fileInput">Seleziona un file :</label>
+    <label for="fileInput">Seleziona il file tabella migranti :</label>
     <input type="file" id="fileInput" accept:".csv" onchange="loadFile(event)">
     
     <div id="tableContainer"></div>
