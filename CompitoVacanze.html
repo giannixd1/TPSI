@@ -5,7 +5,7 @@
     <script>
         function loadFile() {
             let fileReader = new FileReader();
-            let fileInput = new Blob(["/mnt/data/table.csv"], { type: 'text/plain' });
+            let fileInput = new Blob([/mnt/data/table.csv], { type: 'text/plain' });
 
             fileReader.onload = function() {
                 let text = fileReader.result;
