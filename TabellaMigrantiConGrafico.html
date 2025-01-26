@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<body>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+        canvas {
+            margin-top: 20px;
+            border: 1px solid black;
+        }
+    </style>
+    <label for="fileInput">Seleziona il file tabella migranti :</label>
+    <input type="file" id="fileInput" accept: ".csv" onchange="loadFile(event)">
+    <div id="tableContainer"></div>
+    <canvas id="chartCanvas" width="800" height="400"></canvas>
+    <script>
+        function loadFile(event) {
+            let fileInput = event.target.files[0];
+            let fileReader = new FileReader();
+            fileReader.onload = function() {
+                let text = fileReader.result;
+                let table = document.createElement('table');
+                let rows = text.split('\n');
+                let dataPoints = [];
+                for (let i = 0; i < rows.length; i++) {
+                    let row = rows[i].split(',').map(function(cell) {
+                        return cell.replace(/"/g, '').trim();
+                    });
+                    if (i === 0) {
+                        let tr = document.createElement('tr');
+                        for (let j = 0; j < row.length; j++) {
+                            let th = document.createElement('th');
+                            th.textContent = row[j];
+                            tr.appendChild(th);
+                        }
+                        table.appendChild(tr);
+                    } else if (row.length >= 2) {
+                        let x = parseFloat(row[0]);
+                        let y = parseFloat(row[1]);
+                        let tr = document.createElement('tr');
+                        for (let j = 0; j < row.length; j++) {
+                            let td = document.createElement('td');
+                            td.textContent = row[j];
+                            tr.appendChild(td);
+                        }
+                        table.appendChild(tr);
+                        if (!isNaN(x) && !isNaN(y)) {
+                            dataPoints.push({ x: x, y: y });
+                        }
+                    }
+                }
+                document.getElementById('tableContainer').innerHTML = '';
+                document.getElementById('tableContainer').appendChild(table);
+                if (dataPoints.length > 0) {
+                    drawGraph(dataPoints);
+                }
+            };
+            fileReader.readAsText(fileInput);
+        }
+        function drawGraph(dataPoints) {
+            let canvas = document.getElementById('chartCanvas');
+            let ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            let padding = 50;
+            let width = canvas.width - padding * 2;
+            let height = canvas.height - padding * 2;
+            let xValues = dataPoints.map(function(p) { return p.x; });
+            let yValues = dataPoints.map(function(p) { return p.y; });
+            let xMin = Math.min.apply(null, xValues);
+            let xMax = Math.max.apply(null, xValues);
+            let yMin = Math.min.apply(null, yValues);
+            let yMax = Math.max.apply(null, yValues);
+            function scaleX(x) {
+                return padding + ((x - xMin) / (xMax - xMin)) * width;
+            }
+            function scaleY(y) {
+                return canvas.height - padding - ((y - yMin) / (yMax - yMin)) * height;
+            }
+            ctx.beginPath();
+            ctx.moveTo(padding, padding);
+            ctx.lineTo(padding, canvas.height - padding);
+            ctx.lineTo(canvas.width - padding, canvas.height - padding);
+            ctx.strokeStyle = 'black';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.strokeStyle = 'blue';
+            ctx.lineWidth = 2;
+            for (let i = 0; i < dataPoints.length - 1; i++) {
+                let startX = scaleX(dataPoints[i].x);
+                let startY = scaleY(dataPoints[i].y);
+                let endX = scaleX(dataPoints[i + 1].x);
+                let endY = scaleY(dataPoints[i + 1].y);
+                ctx.moveTo(startX, startY);
+                ctx.lineTo(endX, endY);
+                ctx.beginPath();
+                ctx.arc(startX, startY, 5, 0, Math.PI * 2);
+                ctx.fillStyle = 'red';
+                ctx.fill();
+                ctx.closePath();
+                ctx.beginPath();
+            }
+            let lastX = scaleX(dataPoints[dataPoints.length - 1].x);
+            let lastY = scaleY(dataPoints[dataPoints.length - 1].y);
+            ctx.arc(lastX, lastY, 5, 0, Math.PI * 2);
+            ctx.fillStyle = 'red';
+            ctx.fill();
+            ctx.stroke();
+        }
+    </script>
+</body>
+</html>
