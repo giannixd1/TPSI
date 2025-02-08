@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<body>
+    <h2>Carica un file di testo per criptarlo</h2>
+    <input type="file" id="fileInput">
+    <button onclick="encryptFile()">Cripta e Salva</button>
+    <p id="status"></p>
+    <a href="decrypt.html">Vai alla pagina di decriptazione</a>
+
+    <script>
+        function encryptText(text) {
+            const alfabeto = "abcdefghijklmnopqrstuvwxyz";
+            const alfabetoinv = "zyxwvutsrqponmlkjihgfedcba";
+            let testocriptato = "";
+
+            for (let i = 0; i < text.length; i++) {
+                let char = text[i].toLowerCase();
+                let index = alfabeto.indexOf(char);
+                testocriptato += index !== -1 ? alfabetoinv[index] : char;
+            }
+            return testocriptato;
+        }
+
+        function encryptFile() {
+            let fileInput = document.getElementById("fileInput");
+            let file = fileInput.files[0];
+
+            if (!file) {
+                alert("Seleziona un file prima di criptare.");
+                return;
+            }
+
+            let reader = new FileReader();
+            reader.onload = function(event) {
+                let text = event.target.result;
+                let encryptedText = encryptText(text);
+
+                localStorage.setItem("encryptedText", encryptedText);
+                document.getElementById("status").innerText = "Testo criptato e salvato!";
+            };
+            
+            reader.readAsText(file);
+        }
+    </script>
+</body>
+</html>
