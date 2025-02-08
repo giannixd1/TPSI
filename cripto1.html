@@ -5,7 +5,7 @@
     <input type="file" id="fileInput">
     <button onclick="criptaFile()">Cripta e Salva</button>
     <p id="stato"></p>
-    <a href="decrypt.html">Vai alla pagina di decriptazione</a>
+    <button onclick="vaiADecriptazione()">Vai alla pagina di decriptazione</button>
 
     <script>
         function criptaTesto(testo) {
@@ -41,8 +41,13 @@
             
             lettore.readAsText(file);
         }
+
+        function vaiADecriptazione() {
+            window.location.href = "decrypt.html";
+        }
     </script>
 </body>
 </html>
+
 
     
