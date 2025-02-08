@@ -2,10 +2,11 @@
 <html>
 <body>
     <h2>Testo Criptato</h2>
+    <p> la chiave è: alfabetoinvertito</p>
     <p id="testoCriptato"></p>
 
     <h3>Inserisci la chiave per decriptare:</h3>
-    <input type="text" id="chiaveDecriptazione" maxlength="1">
+    <input type="text" id="chiaveDecriptazione">
     <button onclick="decriptaTesto()">Decripta</button>
     
     <h3>Testo Decriptato</h3>
@@ -34,7 +35,7 @@
                 return;
             }
 
-            if (chiave !== "a") {
+            if (chiave !== "alfabetoinvertito") {
                 alert("Chiave errata! Riprova.");
                 return;
             }
