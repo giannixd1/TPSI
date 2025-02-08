@@ -3,42 +3,48 @@
 <body>
     <h2>Carica un file di testo per criptarlo</h2>
     <input type="file" id="fileInput">
-    <button onclick="encryptFile()">Cripta e Salva</button>
-    <p id="status"></p>
+    <button onclick="criptaFile()">Cripta e Salva</button>
+    <p id="stato"></p>
     <a href="decrypt.html">Vai alla pagina di decriptazione</a>
 
     <script>
-        function encryptText(text) {
+        function criptaTesto(testo) {
             const alfabeto = "abcdefghijklmnopqrstuvwxyz";
-            const alfabetoinv = "zyxwvutsrqponmlkjihgfedcba";
-            let testocriptato = "";
+            const alfabetoInvertito = "zyxwvutsrqponmlkjihgfedcba";
+            let testoCriptato = "";
 
-            for (let i = 0; i < text.length; i++) {
-                let char = text[i].toLowerCase();
-                let index = alfabeto.indexOf(char);
-                testocriptato += index !== -1 ? alfabetoinv[index] : char;
+            for (let i = 0; i < testo.length; i++) {
+                let carattere = testo[i].toLowerCase();
+                let indice = alfabeto.indexOf(carattere);
+                testoCriptato += indice !== -1 ? alfabetoInvertito[indice] : carattere;
             }
-            return testocriptato;
+            return testoCriptato;
         }
 
-        function encryptFile() {
-            let fileInput = document.getElementById("fileInput");
-            let file = fileInput.files[0];
+        function criptaFile() {
+            let inputFile = document.getElementById("fileInput");
+            let file = inputFile.files[0];
 
             if (!file) {
                 alert("Seleziona un file prima di criptare.");
                 return;
             }
 
-            let reader = new FileReader();
-            reader.onload = function(event) {
-                let text = event.target.result;
-                let encryptedText = encryptText(text);
+            let lettore = new FileReader();
+            lettore.onload = function(evento) {
+                let testo = evento.target.result;
+                let testoCriptato = criptaTesto(testo);
 
-                localStorage.setItem("encryptedText", encryptedText);
-                document.getElementById("status").innerText = "Testo criptato e salvato!";
+                localStorage.setItem("testoCriptato", testoCriptato);
+                document.getElementById("stato").innerText = "Testo criptato e salvato!";
             };
             
+            lettore.readAsText(file);
+        }
+    </script>
+</body>
+</html>
+
             reader.readAsText(file);
         }
     </script>
