@@ -2,15 +2,16 @@
 <html>
 <body>
     <h2>Testo Criptato</h2>
-    <p> la chiave è: alfabetoinvertito</p>
     <p id="testoCriptato"></p>
 
-    <h3>Inserisci la chiave per decriptare:</h3>
+    <h3>Inserisci la chiave per decriptare (alfabetoinvertito):</h3>
     <input type="text" id="chiaveDecriptazione">
     <button onclick="decriptaTesto()">Decripta</button>
     
     <h3>Testo Decriptato</h3>
     <p id="testoDecriptato"></p>
+
+    <button onclick="vaiACriptazione()">Torna alla pagina di criptazione</button>
 
     <script>
         function criptaTesto(testo) {
@@ -43,6 +44,10 @@
             document.getElementById("testoDecriptato").innerText = criptaTesto(testoCriptato);
         }
 
+        function vaiACriptazione() {
+            window.location.href = "index.html";
+        }
+
         window.onload = function() {
             let testoCriptato = localStorage.getItem("testoCriptato");
             if (testoCriptato) {
@@ -52,4 +57,5 @@
     </script>
 </body>
 </html>
+
 
