@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<body>
+    <h2>Testo Criptato</h2>
+    <p id="testoCriptato"></p>
+
+    <h3>Inserisci la chiave per decriptare:</h3>
+    <input type="text" id="chiaveDecriptazione" maxlength="1">
+    <button onclick="decriptaTesto()">Decripta</button>
+    
+    <h3>Testo Decriptato</h3>
+    <p id="testoDecriptato"></p>
+
+    <script>
+        function criptaTesto(testo) {
+            const alfabeto = "abcdefghijklmnopqrstuvwxyz";
+            const alfabetoInvertito = "zyxwvutsrqponmlkjihgfedcba";
+            let testoCriptato = "";
+
+            for (let i = 0; i < testo.length; i++) {
+                let carattere = testo[i].toLowerCase();
+                let indice = alfabeto.indexOf(carattere);
+                testoCriptato += indice !== -1 ? alfabetoInvertito[indice] : carattere;
+            }
+            return testoCriptato;
+        }
+
+        function decriptaTesto() {
+            let chiave = document.getElementById("chiaveDecriptazione").value.toLowerCase();
+            let testoCriptato = localStorage.getItem("testoCriptato");
+
+            if (!testoCriptato) {
+                alert("Nessun testo criptato trovato.");
+                return;
+            }
+
+            if (chiave !== "a") {
+                alert("Chiave errata! Riprova.");
+                return;
+            }
+
+            document.getElementById("testoDecriptato").innerText = criptaTesto(testoCriptato);
+        }
+
+        window.onload = function() {
+            let testoCriptato = localStorage.getItem("testoCriptato");
+            if (testoCriptato) {
+                document.getElementById("testoCriptato").innerText = testoCriptato;
+            }
+        };
+    </script>
+</body>
+</html>
+
