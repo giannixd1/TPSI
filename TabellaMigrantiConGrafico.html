@@ -1,121 +1,125 @@
 <!DOCTYPE html>
 <html>
 <body>
+    <h2>Grafico e Tabella Sbarchi Migranti</h2>
+    <input type="file" id="fileInput" accept=".csv">
+    <canvas id="grafico" width="800" height="500"></canvas>
+    <h3>Tabella Dati</h3>
+    <table id="tabella">
+        <thead>
+            <tr>
+                <th>Anno</th>
+                <th>Sbarchi</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
     <style>
         table {
+            width: 50%;
             border-collapse: collapse;
-            width: 100%;
-        }
-        table, th, td {
-            border: 1px solid black;
+            margin-top: 20px;
         }
         th, td {
-            padding: 8px;
-            text-align: left;
-        }
-        canvas {
-            margin-top: 20px;
             border: 1px solid black;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: lightgray;
         }
     </style>
-    <label for="fileInput">Seleziona il file tabella migranti :</label>
-    <input type="file" id="fileInput" accept: ".csv" onchange="loadFile(event)">
-    <div id="tableContainer"></div>
-    <canvas id="chartCanvas" width="800" height="400"></canvas>
+
     <script>
-        function loadFile(event) {
-            let fileInput = event.target.files[0];
-            let fileReader = new FileReader();
-            fileReader.onload = function() {
-                let text = fileReader.result;
-                let table = document.createElement('table');
-                let rows = text.split('\n');
-                let dataPoints = [];
-                for (let i = 0; i < rows.length; i++) {
-                    let row = rows[i].split(',').map(function(cell) {
-                        return cell.replace(/"/g, '').trim();
-                    });
-                    if (i === 0) {
-                        let tr = document.createElement('tr');
-                        for (let j = 0; j < row.length; j++) {
-                            let th = document.createElement('th');
-                            th.textContent = row[j];
-                            tr.appendChild(th);
-                        }
-                        table.appendChild(tr);
-                    } else if (row.length >= 2) {
-                        let x = parseFloat(row[0]);
-                        let y = parseFloat(row[1]);
-                        let tr = document.createElement('tr');
-                        for (let j = 0; j < row.length; j++) {
-                            let td = document.createElement('td');
-                            td.textContent = row[j];
-                            tr.appendChild(td);
-                        }
-                        table.appendChild(tr);
-                        if (!isNaN(x) && !isNaN(y)) {
-                            dataPoints.push({ x: x, y: y });
-                        }
+        let fileInput = document.getElementById("fileInput");
+        let canvas = document.getElementById("grafico");
+        let ctx = canvas.getContext("2d");
+        let tabellaBody = document.querySelector("#tabella tbody");
+
+        fileInput.addEventListener("change", function(event) {
+            let file = event.target.files[0];
+            if (file) {
+                let reader = new FileReader();
+                reader.onload = function(e) {
+                    processaCSV(e.target.result);
+                };
+                reader.readAsText(file);
+            }
+        });
+
+        function processaCSV(text) {
+            let righe = text.split("\n").map(function(riga) {
+                return riga.replace(/"/g, '').trim();
+            }).slice(1);
+            let anni = [];
+            let sbarchi = [];
+            tabellaBody.innerHTML = "";
+
+            for (let i = 0; i < righe.length; i++) {
+                let dati = righe[i].split(",");
+                if (dati.length === 2) {
+                    let anno = dati[0].trim();
+                    let numero = parseInt(dati[1].trim());
+                    if (!isNaN(numero)) {
+                        anni.push(anno);
+                        sbarchi.push(numero);
+                        aggiungiRigaTabella(anno, numero);
                     }
                 }
-                document.getElementById('tableContainer').innerHTML = '';
-                document.getElementById('tableContainer').appendChild(table);
-                if (dataPoints.length > 0) {
-                    drawGraph(dataPoints);
-                }
-            };
-            fileReader.readAsText(fileInput);
+            }
+
+            if (anni.length > 0 && sbarchi.length > 0) {
+                disegnaGrafico(anni, sbarchi);
+            } else {
+                alert("Errore nel file CSV: dati non validi.");
+            }
         }
-        function drawGraph(dataPoints) {
-            let canvas = document.getElementById('chartCanvas');
-            let ctx = canvas.getContext('2d');
+
+        function aggiungiRigaTabella(anno, sbarchi) {
+            let riga = document.createElement("tr");
+            let cellaAnno = document.createElement("td");
+            let cellaSbarchi = document.createElement("td");
+            cellaAnno.textContent = anno;
+            cellaSbarchi.textContent = sbarchi;
+            riga.appendChild(cellaAnno);
+            riga.appendChild(cellaSbarchi);
+            tabellaBody.appendChild(riga);
+        }
+
+        function disegnaGrafico(anni, sbarchi) {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            let padding = 50;
-            let width = canvas.width - padding * 2;
-            let height = canvas.height - padding * 2;
-            let xValues = dataPoints.map(function(p) { return p.x; });
-            let yValues = dataPoints.map(function(p) { return p.y; });
-            let xMin = Math.min.apply(null, xValues);
-            let xMax = Math.max.apply(null, xValues);
-            let yMin = Math.min.apply(null, yValues);
-            let yMax = Math.max.apply(null, yValues);
-            function scaleX(x) {
-                return padding + ((x - xMin) / (xMax - xMin)) * width;
-            }
-            function scaleY(y) {
-                return canvas.height - padding - ((y - yMin) / (yMax - yMin)) * height;
-            }
             ctx.beginPath();
-            ctx.moveTo(padding, padding);
-            ctx.lineTo(padding, canvas.height - padding);
-            ctx.lineTo(canvas.width - padding, canvas.height - padding);
-            ctx.strokeStyle = 'black';
-            ctx.lineWidth = 2;
+            ctx.moveTo(50, 450);
+            ctx.lineTo(750, 450);
+            ctx.lineTo(750, 50);
             ctx.stroke();
-            ctx.beginPath();
-            ctx.strokeStyle = 'blue';
-            ctx.lineWidth = 2;
-            for (let i = 0; i < dataPoints.length - 1; i++) {
-                let startX = scaleX(dataPoints[i].x);
-                let startY = scaleY(dataPoints[i].y);
-                let endX = scaleX(dataPoints[i + 1].x);
-                let endY = scaleY(dataPoints[i + 1].y);
-                ctx.moveTo(startX, startY);
-                ctx.lineTo(endX, endY);
+
+            let maxSbarchi = Math.max.apply(null, sbarchi);
+
+            for (let i = 0; i < anni.length; i++) {
+                let x = 50 + (i * (700 / anni.length));
+                let y = 450 - (sbarchi[i] / maxSbarchi * 400);
+
                 ctx.beginPath();
-                ctx.arc(startX, startY, 5, 0, Math.PI * 2);
-                ctx.fillStyle = 'red';
+                ctx.arc(x, y, 4, 0, Math.PI * 2);
+                ctx.fillStyle = "red";
                 ctx.fill();
-                ctx.closePath();
-                ctx.beginPath();
+
+                if (i > 0) {
+                    let prevX = 50 + ((i - 1) * (700 / anni.length));
+                    let prevY = 450 - (sbarchi[i - 1] / maxSbarchi * 400);
+                    ctx.beginPath();
+                    ctx.moveTo(prevX, prevY);
+                    ctx.lineTo(x, y);
+                    ctx.strokeStyle = "blue";
+                    ctx.stroke();
+                }
+                ctx.fillStyle = "black";
+                ctx.fillText(anni[i], x - 10, 470);
             }
-            let lastX = scaleX(dataPoints[dataPoints.length - 1].x);
-            let lastY = scaleY(dataPoints[dataPoints.length - 1].y);
-            ctx.arc(lastX, lastY, 5, 0, Math.PI * 2);
-            ctx.fillStyle = 'red';
-            ctx.fill();
-            ctx.stroke();
         }
     </script>
 </body>
 </html>
+
